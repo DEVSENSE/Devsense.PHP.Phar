@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Phar.Package
+namespace Devsense.PHP.Phar
 {
     /// <summary>
     /// Represents a PHAR file.

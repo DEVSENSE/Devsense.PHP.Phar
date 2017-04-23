@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Phar.Package
+namespace Devsense.PHP.Phar
 {
     /// <summary>
     /// Common helper methods.

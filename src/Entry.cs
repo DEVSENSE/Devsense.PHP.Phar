@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Phar.Package
+namespace Devsense.PHP.Phar
 {
     /// <summary>
     /// Represents single entry inside the PHAR file.

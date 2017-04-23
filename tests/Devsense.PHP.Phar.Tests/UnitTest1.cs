@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace PharPackage.Tests
+namespace Devsense.PHP.Phar.Tests
 {
     public class UnitTest1
     {
