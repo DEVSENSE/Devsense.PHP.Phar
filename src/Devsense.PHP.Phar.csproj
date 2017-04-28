@@ -4,7 +4,7 @@
     <VersionPrefix Condition=" '$(VersionPrefix)'=='' ">1.0.0</VersionPrefix>
     <VersionSuffix Condition=" '$(VersionSuffix)'=='' "></VersionSuffix>
 
-    <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <AssemblyName>Phar.Package</AssemblyName>
     <RootNamespace>Phar.Package</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
