@@ -5,19 +5,15 @@
     <VersionSuffix Condition=" '$(VersionSuffix)'=='' "></VersionSuffix>
 
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
-    <AssemblyName>Phar.Package</AssemblyName>
-    <RootNamespace>Phar.Package</RootNamespace>
+    <AssemblyName>Devsense.PHP.Phar</AssemblyName>
+    <RootNamespace>Devsense.PHP.Phar</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Provides support for understanding PHP PHAR packages.</Description>
-    <PackageProjectUrl>https://github.com/iolevel/PharPackage</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/iolevel/PharPackage.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>php,phar</PackageTags>
-	
+
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)../build/StrongKeys/core.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-	<PublicSign>true</PublicSign>
-
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
   </PropertyGroup>
 
 </Project>
