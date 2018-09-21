@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Devsense.PHP.Phar
@@ -23,63 +24,68 @@ namespace Devsense.PHP.Phar
             /// <summary>
             /// No compression flag. (zero)
             /// </summary>
-            PHAR_ENT_COMPRESSED_NONE  = 0x00000000,
+            PHAR_ENT_COMPRESSED_NONE = 0x00000000,
 
             /// <summary>
             /// GZ compression flag.
             /// </summary>
-            PHAR_ENT_COMPRESSED_GZ    = 0x00001000,
+            PHAR_ENT_COMPRESSED_GZ = 0x00001000,
 
             /// <summary>
             /// BZ2 compression flag.
             /// </summary>
-            PHAR_ENT_COMPRESSED_BZ2   = 0x00002000,
+            PHAR_ENT_COMPRESSED_BZ2 = 0x00002000,
 
             /// <summary>
             /// Permission mask.
             /// </summary>
-            PHAR_ENT_PERM_MASK        = 0x000001FF,
+            PHAR_ENT_PERM_MASK = 0x000001FF,
 
             /// <summary>
             /// User permission mask.
             /// </summary>
-            PHAR_ENT_PERM_MASK_USR    = 0x000001C0,
+            PHAR_ENT_PERM_MASK_USR = 0x000001C0,
 
             /// <summary>
             /// Permission shift user.
             /// </summary>
-            PHAR_ENT_PERM_SHIFT_USR   = 6,
+            PHAR_ENT_PERM_SHIFT_USR = 6,
 
             /// <summary>
             /// Group permission mask.
             /// </summary>
-            PHAR_ENT_PERM_MASK_GRP    = 0x00000038,
+            PHAR_ENT_PERM_MASK_GRP = 0x00000038,
 
             /// <summary>
             /// Permission group shift.
             /// </summary>
-            PHAR_ENT_PERM_SHIFT_GRP   = 3,
+            PHAR_ENT_PERM_SHIFT_GRP = 3,
 
             /// <summary>
             /// Other permission mask.
             /// </summary>
-            PHAR_ENT_PERM_MASK_OTH    = 0x00000007,
+            PHAR_ENT_PERM_MASK_OTH = 0x00000007,
 
             /// <summary>
             /// Defines file.
             /// </summary>
-            PHAR_ENT_PERM_DEF_FILE    = 0x000001B6,
+            PHAR_ENT_PERM_DEF_FILE = 0x000001B6,
 
             /// <summary>
             /// Defines directory.
             /// </summary>
-            PHAR_ENT_PERM_DEF_DIR     = 0x000001FF,
+            PHAR_ENT_PERM_DEF_DIR = 0x000001FF,
         }
+
+        /// <summary>
+        /// Gets compression flag value or <c>0</c>.
+        /// </summary>
+        public EntryFlags Compression { get { return _flags & EntryFlags.PHAR_ENT_COMPRESSION_MASK; } }
 
         /// <summary>
         /// Gets value indicating whether the the content of the entry is compressed.
         /// </summary>
-        public bool IsCompressed { get { return (_flags & EntryFlags.PHAR_ENT_COMPRESSION_MASK) != 0; } }
+        public bool IsCompressed { get { return Compression != 0; } }
 
         /// <summary>
         /// Gets value indicating whether the entry represents a directory.
@@ -109,7 +115,7 @@ namespace Devsense.PHP.Phar
         private EntryFlags _flags;
         private byte[] _metadata;
         private string _content;
-        
+
         /// <summary>
         /// Reads the entry header and returns new <see cref="Entry"/> instance.
         /// </summary>
@@ -139,8 +145,6 @@ namespace Devsense.PHP.Phar
             _compressedSize = (int)reader.ReadUInt32();  // Compressed file size in bytes
             uint checksum = reader.ReadUInt32();         // CRC32 checksum of un-compressed file contents
             uint flags = reader.ReadUInt32();            // Bit-mapped File-specific flags
-            uint metadataLength = reader.ReadUInt32();   // Serialized File Meta-data length (0 for none)
-            _metadata = reader.ReadBytes((int)metadataLength);
 
             if (isDir)
             {
@@ -148,20 +152,37 @@ namespace Devsense.PHP.Phar
                 _fileName = _fileName.TrimEnd('/');
             }
 
-            if (!IsCompressed && _fileSize != _compressedSize)
-                throw new FormatException();
+            uint metadataLength = reader.ReadUInt32();   // Serialized File Meta-data length (0 for none)
+            _metadata = reader.ReadBytes((int)metadataLength);
 
             _flags = (EntryFlags)flags;
             _checksum = checksum;
+
+            //
+            if (!IsCompressed && _fileSize != _compressedSize)
+                throw new FormatException();
         }
 
         internal void InitializeContent(BinaryReader reader)
         {
-            // TODO: check for compression flags
-            if (this.IsCompressed)
-                throw new NotImplementedException();
+            var bytes = reader.ReadBytes(_compressedSize);
 
-            _content = Encoding.UTF8.GetString(reader.ReadBytes((int)_compressedSize));
+            switch (this.Compression)
+            {
+                case EntryFlags.PHAR_ENT_COMPRESSED_NONE:    
+                    _content = Encoding.UTF8.GetString(bytes);
+                    break;
+
+                case EntryFlags.PHAR_ENT_COMPRESSED_GZ:
+                    using (var output = new StreamReader(new DeflateStream(new MemoryStream(bytes), CompressionMode.Decompress, leaveOpen: false)))
+                    {
+                        _content = output.ReadToEnd();
+                    }
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Compression flag '{Compression}'.");
+            }
         }
     }
 }
