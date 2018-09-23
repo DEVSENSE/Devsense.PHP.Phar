@@ -1,2 +1,1 @@
-# PharPackage
-PHP PHAR file support.
+PHAR file reader in C#.
