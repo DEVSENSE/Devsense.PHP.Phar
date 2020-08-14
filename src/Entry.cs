@@ -105,7 +105,7 @@ namespace Devsense.PHP.Phar
         /// <summary>
         /// Gets the content of the entry.
         /// </summary>
-        public string Code { get { return _content; } } // TODO: uncompress
+        public string Code { get { return _content; } } // TODO: byte array for binary content ?
 
         private string _fileName;
         private uint _timeStamp;
