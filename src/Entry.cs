@@ -139,17 +139,26 @@ namespace Devsense.PHP.Phar
         {
             uint filenameLength = reader.ReadUInt32();
             _fileName = Encoding.UTF8.GetString(reader.ReadBytes((int)filenameLength));
-            bool isDir = supportsDir && _fileName[_fileName.Length - 1] == '/';
             _fileSize = (int)reader.ReadUInt32();        // Un-compressed file size in bytes
             _timeStamp = reader.ReadUInt32();            // Unix timestamp of file
             _compressedSize = (int)reader.ReadUInt32();  // Compressed file size in bytes
             uint checksum = reader.ReadUInt32();         // CRC32 checksum of un-compressed file contents
             uint flags = reader.ReadUInt32();            // Bit-mapped File-specific flags
 
-            if (isDir)
+            var is_dir = _fileName.Length != 0 && _fileName[_fileName.Length - 1] == '/';
+
+            if (is_dir && supportsDir)
             {
-                flags |= (uint)Entry.EntryFlags.PHAR_ENT_PERM_DEF_DIR;
-                _fileName = _fileName.TrimEnd('/');
+                flags |= (uint)EntryFlags.PHAR_ENT_PERM_DEF_DIR;
+            }
+            else
+            {
+                flags |= (uint)EntryFlags.PHAR_ENT_PERM_DEF_FILE;
+            }
+
+            if (is_dir)
+            {
+                _fileName = _fileName.Substring(0, _fileName.Length - 1);
             }
 
             uint metadataLength = reader.ReadUInt32();   // Serialized File Meta-data length (0 for none)
