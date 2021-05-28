@@ -17,7 +17,7 @@ namespace Devsense.PHP.Phar
         public static PharFile OpenPharFile(string filename)
         {
             if (filename == null)
-                throw new ArgumentNullException("filename");
+                throw new ArgumentNullException(nameof(filename));
 
             byte[] zip_magic = new byte[]{(byte)'P', (byte)'K', 0x03, 0x04};
             byte[] gz_magic = new byte[] { 0x1f, 0x8b, 0x08 };
@@ -111,7 +111,7 @@ namespace Devsense.PHP.Phar
         private static PharFile ReadPharFile(string filename, Stream stream)
         {
             if (stream == null)
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
 
             var stub = ReadStub(stream);
             var manifest = ReadManifest(stream);
