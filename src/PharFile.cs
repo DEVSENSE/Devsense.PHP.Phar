@@ -19,34 +19,47 @@ namespace Devsense.PHP.Phar
             if (filename == null)
                 throw new ArgumentNullException(nameof(filename));
 
-            byte[] zip_magic = new byte[]{(byte)'P', (byte)'K', 0x03, 0x04};
+            using (var stream = File.OpenRead(filename))
+            {
+                return OpenPharFile(stream, filename);
+            }
+        }
+
+        /// <summary>
+        /// Reads and parses given PHAR file.
+        /// </summary>
+        /// <param name="stream">Byte stream with phar content. Stream needs to be seekable (<see cref="Stream.CanSeek"/>).</param>
+        /// <param name="filename">Optional path only used to be stored within newly created <see cref="PharFile.FileName"/>.</param>
+        public static PharFile OpenPharFile(Stream stream, string filename = null)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            byte[] zip_magic = new byte[] { (byte)'P', (byte)'K', 0x03, 0x04 };
             byte[] gz_magic = new byte[] { 0x1f, 0x8b, 0x08 };
             byte[] bz_magic = new byte[] { (byte)'B', (byte)'Z', (byte)'h' };
 
-            using (var stream = File.OpenRead(filename))
+            byte[] buffer = new byte[4];
+            stream.Read(buffer, 0, buffer.Length);
+
+            if (buffer.IsPrefixed(zip_magic))
             {
-                byte[] buffer = new byte[4];
-                stream.Read(buffer, 0, buffer.Length);
+                throw new NotSupportedException("zip");
+            }
+            else if (buffer.IsPrefixed(gz_magic))
+            {
+                throw new NotSupportedException("gz");
+            }
+            else if (buffer.IsPrefixed(bz_magic))
+            {
+                throw new NotSupportedException("bz");
+            }
+            else
+            {
+                // TODO: try to open as tar // https://code.google.com/p/tar-cs/
 
-                if (buffer.IsPrefixed(zip_magic))
-                {
-                    throw new NotSupportedException("zip");
-                }
-                else if (buffer.IsPrefixed(gz_magic))
-                {
-                    throw new NotSupportedException("gz");
-                }
-                else if (buffer.IsPrefixed(bz_magic))
-                {
-                    throw new NotSupportedException("bz");
-                }
-                else 
-                {
-                    // TODO: try to open as tar // https://code.google.com/p/tar-cs/
-
-                    stream.Seek(0, SeekOrigin.Begin);
-                    return ReadPharFile(filename, stream);
-                }
+                stream.Seek(0, SeekOrigin.Begin);
+                return ReadPharFile(filename, stream);
             }
         }
 
