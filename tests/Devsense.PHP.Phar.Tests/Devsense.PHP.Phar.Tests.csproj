@@ -5,11 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="phpstan.1.phar" />
     <None Remove="phpstan.phar" />
     <None Remove="phpunit.phar" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="phpstan.1.phar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="phpstan.phar">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

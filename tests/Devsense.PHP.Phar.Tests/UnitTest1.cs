@@ -14,10 +14,12 @@ namespace Devsense.PHP.Phar.Tests
             Assert.True(manifest.Entries.TryGetValue("php-timer/Duration.php", out var entry) && entry.IsFile);
         }
 
-        [Fact]
-        public void PhpstanFiles()
+        [Theory]
+        [InlineData("phpstan.phar")]
+        [InlineData("phpstan.1.phar")]
+        public void PhpstanFiles(string fname)
         {
-            var phar = PharFile.OpenPharFile("phpstan.phar");
+            var phar = PharFile.OpenPharFile(fname);
             var manifest = phar.Manifest;
 
             Assert.True(manifest.Entries.TryGetValue("bin/phpstan", out var entry) && entry.IsFile);
