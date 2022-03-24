@@ -4,7 +4,7 @@
     <VersionPrefix Condition=" '$(VersionPrefix)'=='' ">1.0.0</VersionPrefix>
     <VersionSuffix Condition=" '$(VersionSuffix)'=='' "></VersionSuffix>
 
-    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;netstandard2.0;net45</TargetFrameworks>
     <AssemblyName>Devsense.PHP.Phar</AssemblyName>
     <RootNamespace>Devsense.PHP.Phar</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
