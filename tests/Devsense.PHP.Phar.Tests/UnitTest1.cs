@@ -24,5 +24,17 @@ namespace Devsense.PHP.Phar.Tests
 
             Assert.True(manifest.Entries.TryGetValue("bin/phpstan", out var entry) && entry.IsFile);
         }
+
+        [Theory]
+        [InlineData("phpstan.phar")]
+        [InlineData("phpstan.1.phar")]
+        [InlineData("phpstan.2.phar")]
+        public void ParsePhar(string fname)
+        {
+            var phar = PharFile.OpenPharFile(fname);
+            var manifest = phar.Manifest;
+
+            Assert.NotNull(manifest);
+        }
     }
 }

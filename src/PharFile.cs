@@ -101,7 +101,7 @@ namespace Devsense.PHP.Phar
 
                     stream.Seek(-buffer.Length + offset, SeekOrigin.Current);
                     stub.AddRange(buffer.Take(offset));
-                    
+
                     //
                     return Encoding.UTF8.GetString(stub.ToArray());
                 }
@@ -113,11 +113,24 @@ namespace Devsense.PHP.Phar
         private static Manifest ReadManifest(Stream stream)
         {
             var reader = new BinaryReader(stream);
+            uint manifestLength;
 
-            uint manifestLength = reader.ReadUInt32();
-            if (manifestLength < 10)
-                throw new FormatException();
+            try
+            {
+                if ((manifestLength = reader.ReadUInt32()) < 10)
+                {
+                    throw new FormatException();
+                }
+            }
+            catch (EndOfStreamException)
+            {
+                // no manifest
+                // phar is containing stub only
 
+                return null;
+            }
+
+            //
             return Manifest.Create(reader);
         }
 
@@ -155,7 +168,7 @@ namespace Devsense.PHP.Phar
         {
             _filename = filename;
             _stub = stub;
-            _manifest = manifest;
+            _manifest = manifest ?? Manifest.CreateEmpty();
         }
     }
 }

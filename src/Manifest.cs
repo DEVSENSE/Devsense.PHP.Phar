@@ -167,5 +167,14 @@ namespace Devsense.PHP.Phar
             manifest.Initialize(reader);
             return manifest;
         }
+
+        public static Manifest/*!*/CreateEmpty()
+        {
+            return new Manifest()
+            {
+                _entriesCount = 0,
+                _entries = new Dictionary<EntryKey, Entry>(),
+            };
+        }
     }
 }
