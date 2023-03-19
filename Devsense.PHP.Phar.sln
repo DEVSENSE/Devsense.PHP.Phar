@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Devsense.PHP.Phar", "src\Devsense.PHP.Phar.csproj", "{F653BCFF-0D18-4ADB-BDFC-7A1104BF512D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Devsense.PHP.Phar.Tests", "tests\Devsense.PHP.Phar.Tests\Devsense.PHP.Phar.Tests.csproj", "{2D2FD379-F573-4623-BBB5-5A65E2221846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Devsense.PHP.Phar.Tests", "tests\Devsense.PHP.Phar.Tests\Devsense.PHP.Phar.Tests.csproj", "{2D2FD379-F573-4623-BBB5-5A65E2221846}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
