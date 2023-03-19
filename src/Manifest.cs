@@ -117,17 +117,31 @@ namespace Devsense.PHP.Phar
             return new Version((int)(ver >> 12), (int)((ver >> 8) & 0xF), (int)((ver >> 4) & 0x0F));
         }
 
-        private void Initialize(BinaryReader reader)
+        private void Initialize(BinaryReader reader, uint manifest_len)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
             _entriesCount = reader.ReadUInt32();
+
+            if (_entriesCount > int.MaxValue ||
+                _entriesCount > (manifest_len - 18) / (5 * 4 + 1))
+                throw new FormatException($"Too many entries: {_entriesCount}.");
+
             _manifestVersion = ParseManifestVersion(((uint)reader.ReadByte() << 8) | ((uint)reader.ReadByte()) & 0xfff0);
+
             _flags = reader.ReadUInt32();
+
             uint aliasLength = reader.ReadUInt32();
+            if (aliasLength > manifest_len)
+                throw new FormatException($"Length of alias seems to be too big: {aliasLength} bytes.");
             _alias = (aliasLength > 0) ? (Encoding.UTF8.GetString(reader.ReadBytes((int)aliasLength))) : null;
+
+
             uint metadataLength = reader.ReadUInt32();
+            if (metadataLength > manifest_len)
+                throw new FormatException($"Size of metadata seems to be too big: {metadataLength} bytes.");
+
             _metadata = reader.ReadBytes((int)metadataLength);
             
             // entries
@@ -142,7 +156,7 @@ namespace Devsense.PHP.Phar
             var supportsDir = _manifestVersion >= DirSupportVersion;
 
             // read entries
-            for (int entryindex = 0; entryindex < _entriesCount; entryindex++)
+            for (uint entryindex = 0; entryindex < _entriesCount; entryindex++)
             {
                 list.Add(Entry.CreateEntry(reader, supportsDir));
             }
@@ -161,10 +175,10 @@ namespace Devsense.PHP.Phar
         /// <summary>
         /// Creates <see cref="Manifest"/> and shifts reader to the end of entries.
         /// </summary>
-        public static Manifest/*!*/Create(BinaryReader reader)
+        public static Manifest/*!*/Create(BinaryReader reader, uint manifest_len)
         {
             var manifest = new Manifest();
-            manifest.Initialize(reader);
+            manifest.Initialize(reader, manifest_len);
             return manifest;
         }
 

@@ -117,9 +117,14 @@ namespace Devsense.PHP.Phar
 
             try
             {
-                if ((manifestLength = reader.ReadUInt32()) < 10)
+                manifestLength = reader.ReadUInt32();
+                if (manifestLength < 18)
                 {
-                    throw new FormatException();
+                    throw new FormatException($"Manifest length too small, {manifestLength} byte(s).");
+                }
+                if (manifestLength > 100 * 1024 * 1024) // 100MB limit
+                {
+                    throw new FormatException($"manifest length too big, {manifestLength} bytes.");
                 }
             }
             catch (EndOfStreamException)
@@ -131,7 +136,7 @@ namespace Devsense.PHP.Phar
             }
 
             //
-            return Manifest.Create(reader);
+            return Manifest.Create(reader, manifestLength);
         }
 
         private static PharFile ReadPharFile(string filename, Stream stream)
